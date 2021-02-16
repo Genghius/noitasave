@@ -1,0 +1,50 @@
+#!/bin/sh
+
+SAVEDIR=~/.wine/drive_c/users/$(whoami)/AppData/LocalLow/Nolla_Games_Noita/save00
+BACKUPDIR=~/.cache/noitasaveb
+
+[ -d BACKUPDIR ] || mkdir -p $BACKUPDIR
+
+usage(){
+	printf "%s\nUsage: ns [save|load|list|delete] [savename]\n" "$1"
+	exit 1
+}
+
+save(){
+	cp -r $SAVEDIR $BACKUPDIR/$1
+	printf "Saved %s\n" "$1"
+}
+
+load(){
+	[ -d $BACKUPDIR/$1 ] || usage "$1 not a saved directory"
+	cp -r $BACKUPDIR/$1/* $SAVEDIR
+	printf "Loaded %s\n" "$1"
+}
+
+list(){
+	ls $BACKUPDIR
+}
+
+delete(){
+	[ -d $BACKUPDIR/$1 ] || usage "$1 not a saved directory"
+	rm -rf $BACKUPDIR/$1
+	printf "Deleted %s\n" "$1"
+}
+
+[ "$1" ] || usage "No mode specified."
+
+case $1 in
+	save)
+		[ "$2" ] || usage "No save name specified."
+		save $2;;
+	load)
+		[ "$2" ] || usage "No save name specified."
+		load $2;;
+	list)
+		list;;
+	delete)
+		[ "$2" ] || usage "No save name specified."
+		delete $2;;
+	*)
+		usage "$1 not a recognized option.";;
+esac
